@@ -27,5 +27,5 @@ elif [[ "$1" =~ ^telnet://([0-9.]+):([0-9]+)$ ]]; then
 
 else
     # 否则，调用原始的 xdg-open
-    command xdg-open "$@"
+    command /usr/bin/xdg-open "$@"
 fi
