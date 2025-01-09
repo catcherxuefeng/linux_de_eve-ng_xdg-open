@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# 自定义 xdg-open 替代脚本，优化eve-ng
+
+# 检查是否是 capture:// 开头的链接并包含特定模式 == 优化抓包
+if [[ "$1" =~ ^capture://([0-9.]+)/([^/]+)$ ]]; then
+    # 提取 IP 地址和接口名称
+    ip=${BASH_REMATCH[1]}
+    interface=${BASH_REMATCH[2]}
+
+    # 构建 tcpdump 和 wireshark 命令
+    ssh_command="ssh eve.k \"tcpdump -i $interface -U -s0 -w -\""
+    wireshark_command="wireshark -k -i -"
+
+    # 使用 xfce4-terminal 打开新终端窗口并在其中执行命令
+    # 请确认你的 wireshark 可以用普通用户抓包
+    xfce4-terminal --command="bash -c '$ssh_command | $wireshark_command; exec bash'"
+
+# 检查是否是 telnet:// 开头的链接并包含 IP 和端口 == 优化telnet
+elif [[ "$1" =~ ^telnet://([0-9.]+):([0-9]+)$ ]]; then
+    # 提取 IP 地址和端口号
+    ip=${BASH_REMATCH[1]}
+    port=${BASH_REMATCH[2]}
+
+    # 使用 xfce4-terminal 打开新终端窗口并在其中执行 telnet 命令
+    xfce4-terminal --command="bash -c 'telnet $ip $port; exec bash'"
+
+else
+    # 否则，调用原始的 xdg-open
+    command xdg-open "$@"
+fi
